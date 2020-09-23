@@ -1,0 +1,104 @@
+# https://howto.wared.fr/ubuntu-seedbox-docker-openvpn/#toggle-id-5
+version: '3'
+services:
+  emby:
+    # https://hub.docker.com/r/emby/embyserver
+    image: linuxserver/emby:latest
+    ports:
+      - 8096:8096
+      - 8920:8920
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /home/antoine/docker_perso/seedbox/config/emby:/config
+        #- film:/opt/movies
+      - downloads:/data
+  deluge:
+    # https://hub.docker.com/r/linuxserver/deluge
+    image: linuxserver/deluge:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    network_mode: host
+    volumes:
+      - /home/antoine/docker_perso/seedbox/config/deluge:/config
+      - downloads:/downloads
+  jackett:
+    image: linuxserver/jackett:latest
+    ports:
+      - 9117:9117
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /home/antoine/docker_perso/seedbox/config/jackett:/config
+  sonarr:
+    image: linuxserver/sonarr:latest
+    ports:
+      - 8989:8989
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /home/antoine/docker_perso/seedbox/config/sonarr:/config
+      - downloads:/data
+  radarr:
+    image: linuxserver/radarr:latest
+    ports:
+      - 7878:7878
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /home/antoine/docker_perso/seedbox/config/radarr:/config
+      - downloads:/data
+  lidarr:
+    image: linuxserver/lidarr:latest
+    ports:
+      - 8686:8686
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /home/antoine/docker_perso/seedbox/config/lidarr:/config
+      - downloads:/data
+  plex:
+    image: linuxserver/plex:latest
+    ports:
+      - 32400:32400
+    environment:
+      - VERSION=latest
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/paris
+    volumes:
+      - /home/antoine/docker_perso/seedbox/config/plex:/config
+      - downloads:/data
+  ombi:
+    image: linuxserver/ombi:latest
+    ports:
+      - 3579:3579
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/paris
+    volumes:
+      - /home/antoine/docker_perso/seedbox/config/ombi:/config
+  traefik:
+    image: traefik
+    #ports:
+      #- 80:80
+      #- 443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /home/antoine/docker_perso/seedbox/config/traefik/traefik.toml:/traefik.toml:ro
+      - /home/antoine/docker_perso/seedbox/config/traefik/acme.json:/acme.json
+volumes:
+  downloads:
