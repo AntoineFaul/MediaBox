@@ -18,11 +18,16 @@ services:
   deluge:
     # https://hub.docker.com/r/linuxserver/deluge
     image: linuxserver/deluge:latest
+    ports:
+      - 8112:8112
+      - 58846:58846
+      - 58946:58946
+      - 58946:58946/udp
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Paris
-    network_mode: host
+    #network_mode: host
     volumes:
       - /home/antoine/docker_perso/seedbox/config/deluge:/config
       - downloads:/downloads
@@ -102,3 +107,6 @@ services:
       - /home/antoine/docker_perso/seedbox/config/traefik/acme.json:/acme.json
 volumes:
   downloads:
+networks:
+  default:
+    driver: bridge
