@@ -12,25 +12,48 @@ services:
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - /home/antoine/docker_perso/seedbox/config/emby:/config
+      - /home/antoine/docker_perso/MediaBox/config/emby:/config
         #- film:/opt/movies
       - downloads:/data
+# deluge:
+#   # https://hub.docker.com/r/linuxserver/deluge
+#   image: linuxserver/deluge:latest
+#   ports:
+#     - 8112:8112
+#     - 58846:58846
+#     - 58946:58946
+#     - 58946:58946/udp
+#   environment:
+#     - PUID=1000
+#     - PGID=1000
+#     - TZ=Europe/Paris
+#   #network_mode: host
+#   volumes:
+#     - /home/antoine/docker_perso/MediaBox/config/deluge:/config
+#     - downloads:/downloads
   deluge:
     # https://hub.docker.com/r/linuxserver/deluge
-    image: linuxserver/deluge:latest
+    build: .
     ports:
       - 8112:8112
       - 58846:58846
       - 58946:58946
       - 58946:58946/udp
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=0
+      - PGID=0
       - TZ=Europe/Paris
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    devices:
+      - /dev/net/tun
     #network_mode: host
     volumes:
-      - /home/antoine/docker_perso/seedbox/config/deluge:/config
+      - /home/antoine/docker_perso/MediaBox/config/deluge:/config
       - downloads:/downloads
+      - /home/antoine/docker_perso/MediaBox/nl-free-02.protonvpn.com.tcp.ovpn:/config.ovpn
+      - /home/antoine/docker_perso/MediaBox/ovpn.pass:/ovpn.pass
   jackett:
     image: linuxserver/jackett:latest
     ports:
@@ -40,7 +63,7 @@ services:
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - /home/antoine/docker_perso/seedbox/config/jackett:/config
+      - /home/antoine/docker_perso/MediaBox/config/jackett:/config
   sonarr:
     image: linuxserver/sonarr:latest
     ports:
@@ -50,7 +73,7 @@ services:
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - /home/antoine/docker_perso/seedbox/config/sonarr:/config
+      - /home/antoine/docker_perso/MediaBox/config/sonarr:/config
       - downloads:/data
   radarr:
     image: linuxserver/radarr:latest
@@ -61,7 +84,7 @@ services:
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - /home/antoine/docker_perso/seedbox/config/radarr:/config
+      - /home/antoine/docker_perso/MediaBox/config/radarr:/config
       - downloads:/data
   lidarr:
     image: linuxserver/lidarr:latest
@@ -72,7 +95,7 @@ services:
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - /home/antoine/docker_perso/seedbox/config/lidarr:/config
+      - /home/antoine/docker_perso/MediaBox/config/lidarr:/config
       - downloads:/data
   plex:
     image: linuxserver/plex:latest
@@ -84,7 +107,7 @@ services:
       - PGID=1000
       - TZ=Europe/paris
     volumes:
-      - /home/antoine/docker_perso/seedbox/config/plex:/config
+      - /home/antoine/docker_perso/MediaBox/config/plex:/config
       - downloads:/data
   ombi:
     image: linuxserver/ombi:latest
@@ -95,7 +118,7 @@ services:
       - PGID=1000
       - TZ=Europe/paris
     volumes:
-      - /home/antoine/docker_perso/seedbox/config/ombi:/config
+      - /home/antoine/docker_perso/MediaBox/config/ombi:/config
   traefik:
     image: traefik
     #ports:
@@ -103,8 +126,8 @@ services:
       #- 443:443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /home/antoine/docker_perso/seedbox/config/traefik/traefik.toml:/traefik.toml:ro
-      - /home/antoine/docker_perso/seedbox/config/traefik/acme.json:/acme.json
+      - /home/antoine/docker_perso/MediaBox/config/traefik/traefik.toml:/traefik.toml:ro
+      - /home/antoine/docker_perso/MediaBox/config/traefik/acme.json:/acme.json
 volumes:
   downloads:
 networks:
