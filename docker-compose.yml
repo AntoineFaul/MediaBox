@@ -15,45 +15,45 @@ services:
       - /home/antoine/docker_perso/MediaBox/config/emby:/config
         #- film:/opt/movies
       - downloads:/data
-# deluge:
-#   # https://hub.docker.com/r/linuxserver/deluge
-#   image: linuxserver/deluge:latest
-#   ports:
-#     - 8112:8112
-#     - 58846:58846
-#     - 58946:58946
-#     - 58946:58946/udp
-#   environment:
-#     - PUID=1000
-#     - PGID=1000
-#     - TZ=Europe/Paris
-#   #network_mode: host
-#   volumes:
-#     - /home/antoine/docker_perso/MediaBox/config/deluge:/config
-#     - downloads:/downloads
   deluge:
     # https://hub.docker.com/r/linuxserver/deluge
-    build: .
+    image: linuxserver/deluge:latest
     ports:
       - 8112:8112
       - 58846:58846
       - 58946:58946
       - 58946:58946/udp
     environment:
-      - PUID=0
-      - PGID=0
+      - PUID=1000
+      - PGID=1000
       - TZ=Europe/Paris
-    cap_add:
-      - NET_ADMIN
-      - SYS_ADMIN
-    devices:
-      - /dev/net/tun
     #network_mode: host
     volumes:
       - /home/antoine/docker_perso/MediaBox/config/deluge:/config
       - downloads:/downloads
-      - /home/antoine/docker_perso/MediaBox/nl-free-02.protonvpn.com.tcp.ovpn:/config.ovpn
-      - /home/antoine/docker_perso/MediaBox/ovpn.pass:/ovpn.pass
+# deluge:
+#   # https://hub.docker.com/r/linuxserver/deluge
+#   build: .
+#   ports:
+#     - 8112:8112
+#     - 58846:58846
+#     - 58946:58946
+#     - 58946:58946/udp
+#   environment:
+#     - PUID=0
+#     - PGID=0
+#     - TZ=Europe/Paris
+#   cap_add:
+#     - NET_ADMIN
+#     - SYS_ADMIN
+#   devices:
+#     - /dev/net/tun
+#   #network_mode: host
+#   volumes:
+#     - /home/antoine/docker_perso/MediaBox/config/deluge:/config
+#     - downloads:/downloads
+#     - /home/antoine/docker_perso/MediaBox/nl-free-02.protonvpn.com.tcp.ovpn:/config.ovpn
+#     - /home/antoine/docker_perso/MediaBox/ovpn.pass:/ovpn.pass
   jackett:
     image: linuxserver/jackett:latest
     ports:
