@@ -22,6 +22,27 @@ spec:
             name: emby
             port: 
               number: 8096
+  - host: deluge.roon.fr
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: deluge
+            port: 
+              number: 8112
+  - host: privoxy.roon.fr
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: deluge
+            port: 
+              number: 8118
+
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer

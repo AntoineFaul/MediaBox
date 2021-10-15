@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: deluge
+  name: deluge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: deluge
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.network: "true"
+        io.kompose.service: deluge
+    spec:
+      containers:
+        - env:
+            - name: PGID
+              value: "1000"
+            - name: PUID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Paris"
+            - name: VPN_ENABLED
+              value: "true"
+            - name: VPN_USER
+              value: "vy6jk7TNve4sfw0wm1cRDa6d"
+            - name: VPN_PROV
+              value: "custom"
+            - name: VPN_PASS
+              value: "pnQQPbPIJD47cOX/VwXz7Swd"
+            - name: VPN_CLIENT
+              value: "openvpn"
+            - name: ENABLE_PRIVOXY
+              value: "yes"
+            - name: NAME_SERVERS
+              value: "1.1.1.1"
+            - name: VPN_OPTIONS
+              value: ""
+            - name: LAN_NETWORK
+              value: "192.168.0.0/24"
+            - name: STRICT_PORT_FORWARD
+              value: "yes"
+            - name: DEBUG
+              value: "true"
+          #image: linuxserver/deluge:latest
+          image: binhex/arch-delugevpn:latest
+          name: deluge
+          ports:
+            - containerPort: 8112
+            - containerPort: 8118
+            - containerPort: 58846
+            - containerPort: 58946
+            - containerPort: 58946
+              protocol: UDP
+          resources: {}
+          volumeMounts:
+            - mountPath: /config
+              name: deluge-claim0
+            - mountPath: /data
+              name: downloads
+          securityContext:
+            capabilities:
+              add:
+              - NET_ADMIN
+      restartPolicy: Always
+      volumes:
+        - name: deluge-claim0
+          persistentVolumeClaim:
+            claimName: deluge-claim0
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: downloads
+status: {}
