@@ -1,0 +1,41 @@
+#!/usr/bin/with-contenv bash
+
+# Determine if setup is needed
+if [ ! -f /usr/sbin/openvpn ] && \
+[ -f /usr/bin/apt ]; then
+  ## Ubuntu
+  apt-get update
+  apt-get install --no-install-recommends -y \
+    iptables \
+    openvpn \
+    vim
+fi
+if [ ! -f /usr/sbin/openvpn ] && \
+[ -f /sbin/apk ]; then
+  # Alpine
+  apk add --no-cache \
+    iptables \
+    openvpn
+fi
+
+iptables-restore < /etc/iptables/rules.v4
+
+PROTO=$(sed -n '/proto /p' /openvpn.conf | awk '{print $2}')
+
+sed -n '/remote /p' /openvpn.conf | while IFS= read -r remote ; do
+  EXCLUSION_HOST=$(echo $remote | awk '{print $2}')
+  EXCLUSION_PORT=$(echo $remote | awk '{print $3}')
+  EXCLUSION_PROT=$(echo $remote | awk '{print $4}')
+  if [[ -z $EXCLUSION_PROT ]]; then
+    EXCLUSION_PROT=$PROTO
+  fi
+  if expr "$ip" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$' >/dev/null; then
+    true
+  else
+    EXCLUSION_HOST=$(getent hosts $EXCLUSION_HOST | awk '{print $1}')
+  fi
+  iptables -I OUTPUT 3 -o eth0 -p $EXCLUSION_PROT -d $EXCLUSION_HOST --dport $EXCLUSION_PORT -j ACCEPT
+done
+
+iptables -L
+exit 
