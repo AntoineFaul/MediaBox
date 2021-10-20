@@ -30,7 +30,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Paris
-      - DOCKER_MODS=ghcr.io/antoinefaul/linuxserver-openvpn:main
+      - DOCKER_MODS=ghcr.io/antoinefaul/mediabox/openvpn:main
     #network_mode: host
     volumes:
       - ./config/deluge:/config
