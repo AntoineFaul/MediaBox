@@ -21,8 +21,8 @@ fi
 iptables-restore < /etc/iptables/rules.v4
 
 PROTO=$(sed -n '/proto /p' /openvpn.conf | awk '{print $2}')
-if [[ -z $EXCLUSION_PROT ]]; then
-  EXCLUSION_PROT=udp
+if [[ -z $PROTO ]]; then
+  PROTO=udp
 fi
 
 sed -n '/remote /p' /openvpn.conf | while IFS= read -r remote ; do
@@ -37,7 +37,10 @@ sed -n '/remote /p' /openvpn.conf | while IFS= read -r remote ; do
   else
     EXCLUSION_HOST=$(getent hosts $EXCLUSION_HOST | awk '{print $1}')
   fi
-  iptables -I OUTPUT 3 -o eth0 -p $EXCLUSION_PROT -d $EXCLUSION_HOST --dport $EXCLUSION_PORT -j ACCEPT
+  for host in $EXCLUSION_HOST; do
+    iptables -I OUTPUT 3 -o eth0 -p $EXCLUSION_PROT -d $host --dport $EXCLUSION_PORT -j ACCEPT
+  done
+T
 done
 
 iptables -L
