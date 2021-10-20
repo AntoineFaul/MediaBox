@@ -24,6 +24,10 @@
 
 -A INPUT -s 192.168.0.0/16,172.16.0.0/24,10.0.0.0/8 -j ACCEPT
 
+# Allow traffic to deluge client
+
+-A INPUT -p tcp --dport 8112 -j ACCEPT
+
 
 # Then you allow related/established traffic, and drop everything else, without acknowledgement to peers.
 
