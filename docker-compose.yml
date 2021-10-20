@@ -17,6 +17,11 @@ services:
     volumes:
       - ./config/jellyfin:/config
       - downloads:/data
+    labels:
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.roon.fr`)"
+      - "traefik.http.routers.jellyfin.entrypoints=websecure"
+      - "traefik.http.routers.jellyfin.tls.certResolver=lets-encrypt"
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
   deluge:
     image: ghcr.io/linuxserver/deluge:latest
     cap_add:
@@ -105,9 +110,11 @@ services:
       - ./config/ombi:/config
   traefik:
     image: traefik
+    command: --api.insecure=true --providers.docker
     ports:
       - 80:80
       - 443:443
+      - 8080:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/traefik.toml:/traefik.toml:ro
@@ -116,4 +123,5 @@ volumes:
   downloads:
 networks:
   default:
+  traefik:
     #driver: bridge
