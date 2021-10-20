@@ -1,23 +1,26 @@
 # https://howto.wared.fr/ubuntu-seedbox-docker-openvpn/#toggle-id-5
 version: '3'
 services:
-  emby:
-    # https://hub.docker.com/r/emby/embyserver
-    image: linuxserver/emby:latest
+  jellyfin:
+    image: ghcr.io/linuxserver/jellyfin:latest
+    environment: 
+      - PUID=1000
+      - GUID=1000
+      - TZ=Europe/Paris
     ports:
       - 8096:8096
       - 8920:8920
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Paris
+      - 7359:7359
+      - 1900:1900
+    devices:
+      - /dev/dri:/dev/dri
     volumes:
-      - /home/antoine/docker_perso/MediaBox/config/emby:/config
-        #- film:/opt/movies
+      - ./config/jellyfin:/config
       - downloads:/data
   deluge:
-    # https://hub.docker.com/r/linuxserver/deluge
-    image: linuxserver/deluge:latest
+    image: ghcr.io/linuxserver/deluge:latest
+    cap_add:
+      - NET_ADMIN
     ports:
       - 8112:8112
       - 58846:58846
@@ -27,35 +30,16 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Paris
+      - DOCKER_MODS=ghcr.io/antoinefaul/linuxserver-openvpn:main
     #network_mode: host
     volumes:
-      - /home/antoine/docker_perso/MediaBox/config/deluge:/config
+      - ./config/deluge:/config
       - downloads:/downloads
-# deluge:
-#   # https://hub.docker.com/r/linuxserver/deluge
-#   build: .
-#   ports:
-#     - 8112:8112
-#     - 58846:58846
-#     - 58946:58946
-#     - 58946:58946/udp
-#   environment:
-#     - PUID=0
-#     - PGID=0
-#     - TZ=Europe/Paris
-#   cap_add:
-#     - NET_ADMIN
-#     - SYS_ADMIN
-#   devices:
-#     - /dev/net/tun
-#   #network_mode: host
-#   volumes:
-#     - /home/antoine/docker_perso/MediaBox/config/deluge:/config
-#     - downloads:/downloads
-#     - /home/antoine/docker_perso/MediaBox/nl-free-02.protonvpn.com.tcp.ovpn:/config.ovpn
-#     - /home/antoine/docker_perso/MediaBox/ovpn.pass:/ovpn.pass
+      - ./vpn.ovpn:/openvpn.conf
+    devices:
+      - /dev/net/tun 
   jackett:
-    image: linuxserver/jackett:latest
+    image: ghcr.io/linuxserver/jackett:latest
     ports:
       - 9117:9117
     environment:
@@ -63,9 +47,9 @@ services:
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - /home/antoine/docker_perso/MediaBox/config/jackett:/config
+      - ./config/jackett:/config
   sonarr:
-    image: linuxserver/sonarr:latest
+    image: ghcr.io/linuxserver/sonarr:latest
     ports:
       - 8989:8989
     environment:
@@ -73,10 +57,10 @@ services:
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - /home/antoine/docker_perso/MediaBox/config/sonarr:/config
+      - ./config/sonarr:/config
       - downloads:/data
   radarr:
-    image: linuxserver/radarr:latest
+    image: ghcr.io/linuxserver/radarr:latest
     ports:
       - 7878:7878
     environment:
@@ -84,10 +68,10 @@ services:
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - /home/antoine/docker_perso/MediaBox/config/radarr:/config
+      - ./config/radarr:/config
       - downloads:/data
   lidarr:
-    image: linuxserver/lidarr:latest
+    image: ghcr.io/linuxserver/lidarr:latest
     ports:
       - 8686:8686
     environment:
@@ -95,10 +79,10 @@ services:
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - /home/antoine/docker_perso/MediaBox/config/lidarr:/config
+      - ./config/lidarr:/config
       - downloads:/data
   plex:
-    image: linuxserver/plex:latest
+    image: ghcr.io/linuxserver/plex:latest
     ports:
       - 32400:32400
     environment:
@@ -107,10 +91,10 @@ services:
       - PGID=1000
       - TZ=Europe/paris
     volumes:
-      - /home/antoine/docker_perso/MediaBox/config/plex:/config
+      - ./config/plex:/config
       - downloads:/data
   ombi:
-    image: linuxserver/ombi:latest
+    image: ghcr.io/linuxserver/ombi:latest
     ports:
       - 3579:3579
     environment:
@@ -118,18 +102,18 @@ services:
       - PGID=1000
       - TZ=Europe/paris
     volumes:
-      - /home/antoine/docker_perso/MediaBox/config/ombi:/config
+      - ./config/ombi:/config
   traefik:
     image: traefik
-    #ports:
-      #- 80:80
-      #- 443:443
+    ports:
+      - 80:80
+      - 443:443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /home/antoine/docker_perso/MediaBox/config/traefik/traefik.toml:/traefik.toml:ro
-      - /home/antoine/docker_perso/MediaBox/config/traefik/acme.json:/acme.json
+      - ./traefik/traefik.toml:/traefik.toml:ro
+      - ./traefik/acme.json:/acme.json
 volumes:
   downloads:
 networks:
   default:
-    driver: bridge
+    #driver: bridge
